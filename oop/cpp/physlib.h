@@ -65,4 +65,21 @@ std::ostream& operator<<(std::ostream &out, const Vec3d &v) {
     return out;
 }
 
+struct Angles3d
+{
+    double theta;
+    double phi;
+
+    Angles3d(double theta, double phi) : theta(theta), phi(phi) {}
+
+    Vec3d toUnitVector() const {
+        double theta_rad = theta * M_PI / 180.0;
+        double phi_rad = phi * M_PI / 180.0;
+        double x = cos(theta_rad) * sin(phi_rad);
+        double y = sin(theta_rad) * sin(phi_rad);
+        double z = cos(phi_rad);
+        return Vec3d(x, y, z);
+    }
+};
+
 #endif

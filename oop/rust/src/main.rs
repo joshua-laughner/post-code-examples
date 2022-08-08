@@ -16,13 +16,13 @@ trait PhysicsObject {
         println!("Object is at {:.2} with velocity {:.2}", self.get_position(), self.get_velocity())
     }
 
-    fn compute_gravitational_force(me: &impl PhysicsObject, all_objects: &[impl PhysicsObject]) -> Vec3 {
+    fn compute_gravitational_force(&self, all_objects: &[impl PhysicsObject]) -> Vec3 {
         let mut force = Vec3::new_zero();
         for obj in all_objects.iter() {
-            let r2 = (me.get_position() - obj.get_position()).sqr_magnitude();
+            let r2 = (self.get_position() - obj.get_position()).sqr_magnitude();
             if r2 > 1e-10 {
-                let dir = (me.get_position() - obj.get_position()).unit();
-                force += dir * G * me.get_mass() * obj.get_mass() / r2;
+                let dir = (self.get_position() - obj.get_position()).unit();
+                force += dir * G * self.get_mass() * obj.get_mass() / r2;
             }
         }
         return force;
@@ -50,7 +50,7 @@ impl PhysicsObject for PassiveObject {
     fn get_mass(&self) -> f64 { self.mass }
 
     fn compute_force_vector(&mut self, _: f64, all_objects: &[impl PhysicsObject]) -> Vec3 {
-        return Self::compute_gravitational_force(self, all_objects);
+        return self.compute_gravitational_force(all_objects);
     }
 }
 
@@ -71,7 +71,7 @@ impl PhysicsObject for Rocket {
     fn get_mass(&self) -> f64 { self.structural_mass + self.fuel_mass }
 
     fn compute_force_vector(&mut self, dt: f64, all_objects: &[impl PhysicsObject]) -> Vec3 {
-        let mut force = Self::compute_gravitational_force(self, all_objects);
+        let mut force = self.compute_gravitational_force(all_objects);
         let mut fuel_consumed = self.thrust * dt;
         if fuel_consumed > self.fuel_mass {
             fuel_consumed = self.fuel_mass;
